@@ -1,8 +1,18 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CustomParseIntPipe } from 'src/common/pipes/custom-parse-int-pipe.pipe';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
+import { AuthGuard } from '@nestjs/passport';
+import type { AuthenticatedRequest } from 'src/auth/types/authenticated-request';
 
 @Controller('user')
 export class UserController {
@@ -11,8 +21,12 @@ export class UserController {
     private readonly userService: UserService,
   ) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  findOne(@Param('id', CustomParseIntPipe) id: number) {
+  findOne(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', CustomParseIntPipe) id: number,
+  ) {
     return `olá do controller do user #${id}`;
   }
 
